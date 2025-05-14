@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart QnA Bot</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    #questions { margin-bottom: 20px; }
+    button {
+      display: block;
+      margin: 5px 0;
+      padding: 10px;
+      background-color: #e0e0e0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+    }
+    button:hover { background-color: #d0d0ff; }
+    #answerBox {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      white-space: pre-line;
+      line-height: 1.5;
+}
+
+    }
+  </style>
+</head>
+<body>
+  <h2>Ask a Question:</h2>
+  <div id="questions">Loading questions...</div>
+  <div id="answerBox">Click a question to see the answer.</div>
+
+  <script>
+    const webAppURL = "https://script.google.com/macros/s/AKfycbxRGgLTV3bshMyMz5k_PfS48BnqFlkMH5hR7EoKSoqCck6OsW18RWhYJjf-5FXvQS91/exec"; // Replace this with your Apps Script URL
+
+    // Load all questions
+    async function loadQuestions() {
+      const res = await fetch(webAppURL);
+      const questions = await res.json();
+
+      const qBox = document.getElementById("questions");
+      qBox.innerHTML = ""; // Clear loading text
+
+      questions.forEach(q => {
+        const btn = document.createElement("button");
+        btn.textContent = q;
+        btn.onclick = () => ask(q);
+        qBox.appendChild(btn);
+      });
+    }
+
+    // Fetch answer for a clicked question
+    async function ask(question) {
+      const answerBox = document.getElementById("answerBox");
+      answerBox.innerHTML = `<b>Q:</b> ${question}<br>Loading answer...`;
+
+      const res = await fetch(`${webAppURL}?q=${encodeURIComponent(question)}`);
+      const answer = await res.text();
+      //answerBox.innerHTML = `<b>Q:</b> ${question}<br><b>A:</b> ${answer}`;
+      const formattedAnswer = answer.replace(/\n/g, "<br>");
+      answerBox.innerHTML = `<b>Q:</b> ${question}<br><b>A:</b> ${formattedAnswer}`;
+
+    }
+
+    // Initialize
+    loadQuestions();
+  </script>
+</body>
+</html>
